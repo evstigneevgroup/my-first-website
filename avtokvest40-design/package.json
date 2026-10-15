@@ -1,0 +1,9 @@
+{
+  "name": "avtokvest40-brand",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Brand identity build tooling for Avtokvest 40",
+  "dependencies": {
+    "opentype.js": "^1.3.4"
+  }
+}

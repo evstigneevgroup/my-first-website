@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F6F2FD" />
+<title>Ритуал — главный экран</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #7C3AED;
+    --primary-strong: #6D28D9;
+    --primary-soft: #EEE8FD;
+    --accent: #059669;
+    --accent-soft: #DCF3E9;
+    --bg: #F6F2FD;
+    --bg-2: #FBF9FF;
+    --card: #FFFFFF;
+    --fg: #1E1B2E;
+    --muted: #7C7891;
+    --border: #ECE7F7;
+    --shadow-soft: 0 12px 30px -18px rgba(80, 56, 140, 0.35);
+    --shadow-card: 0 6px 18px -12px rgba(80, 56, 140, 0.30);
+    --radius-lg: 26px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    font-family: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--fg);
+    background:
+      radial-gradient(1100px 700px at 20% 0%, #EFE7FD 0%, transparent 55%),
+      radial-gradient(900px 700px at 100% 100%, #E4F3EC 0%, transparent 50%),
+      var(--bg);
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 40px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Device frame -------------------------------------------------- */
+  .device {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    background: #0F0C17;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 2px #262130,
+      0 40px 90px -30px rgba(60, 40, 120, 0.55),
+      inset 0 0 0 2px #3a3348;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 44px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+  }
+
+  .island {
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 118px; height: 33px;
+    background: #0F0C17;
+    border-radius: 20px;
+    z-index: 40;
+  }
+
+  /* Status bar ---------------------------------------------------- */
+  .statusbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px 0 32px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    z-index: 30;
+  }
+  .statusbar .icons { display: flex; align-items: center; gap: 6px; }
+  .statusbar svg { display: block; }
+
+  /* Scrollable content ------------------------------------------- */
+  .content {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 62px 22px 132px;
+    scrollbar-width: none;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Header -------------------------------------------------------- */
+  .appbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .appbar .greet {
+    font-family: "Lora", serif;
+    font-size: 23px;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .appbar .date {
+    margin-top: 5px;
+    font-size: 13.5px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    text-transform: capitalize;
+  }
+  .avatar-wrap { display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 42px; height: 42px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: transform 0.18s var(--ease), color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+  }
+  .icon-btn:hover { color: var(--primary); box-shadow: var(--shadow-card); }
+  .icon-btn:active { transform: scale(0.93); }
+  .icon-btn .dot {
+    position: absolute;
+    margin: -18px 0 0 18px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #F43F5E;
+    border: 2px solid var(--card);
+  }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #A78BFA, #7C3AED);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    display: grid;
+    place-items: center;
+    box-shadow: var(--shadow-card);
+    letter-spacing: 0.3px;
+  }
+
+  /* Hero progress card ------------------------------------------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(140deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+    border-radius: var(--radius-lg);
+    padding: 22px 22px 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 22px 44px -22px rgba(124, 58, 237, 0.75);
+    margin-bottom: 22px;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    width: 190px; height: 190px;
+    right: -60px; top: -80px;
+    background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-text { flex: 1; position: relative; z-index: 2; }
+  .hero-text .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+  .hero-text h2 {
+    font-family: "Lora", serif;
+    font-size: 20px;
+    line-height: 1.25;
+    font-weight: 600;
+    margin: 7px 0 14px;
+  }
+  .streak-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .streak-chip svg { color: #FDE68A; }
+
+  .ring-wrap {
+    position: relative;
+    width: 104px; height: 104px;
+    flex-shrink: 0;
+    z-index: 2;
+  }
+  .ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 9; stroke-linecap: round; }
+  .ring .track { stroke: rgba(255,255,255,0.24); }
+  .ring .progress {
+    stroke: #fff;
+    stroke-dasharray: 263.9;
+    stroke-dashoffset: 263.9;
+    transition: stroke-dashoffset 0.7s var(--ease);
+  }
+  .ring-label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+  .ring-label .pct {
+    font-family: "Lora", serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .ring-label .sub {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.78;
+    margin-top: 3px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Week strip ---------------------------------------------------- */
+  .week {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 26px;
+  }
+  .day {
+    flex: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    font-family: inherit;
+  }
+  .day .letter {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+    transition: color 0.2s var(--ease);
+  }
+  .day .pill {
+    position: relative;
+    width: 40px; height: 52px;
+    border-radius: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    transition: transform 0.22s var(--ease), background 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s var(--ease);
+  }
+  .day .num {
+    font-family: "Lora", serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+    transition: color 0.2s var(--ease);
+  }
+  .day .dot {
+    position: absolute;
+    bottom: 8px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s var(--ease), width 0.2s var(--ease);
+  }
+  .day .dot.partial { background: #C4B5FD; }
+  .day .dot.full { background: var(--accent); }
+  .day:hover .pill { box-shadow: var(--shadow-card); }
+  .day.selected .pill {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 14px 26px -14px rgba(124, 58, 237, 0.9);
+    transform: translateY(-2px);
+  }
+  .day.selected .num { color: #fff; }
+  .day.selected .letter { color: var(--primary); }
+  .day.selected .dot { background: rgba(255,255,255,0.85); }
+  .day.selected .dot.full { background: #86EFAC; }
+  .day.today .letter::after {
+    content: "";
+    display: block;
+    width: 4px; height: 4px;
+    margin: 3px auto 0;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .day.selected.today .letter::after { background: var(--accent); }
+
+  /* Section head -------------------------------------------------- */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-head h3 {
+    font-family: "Lora", serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+  }
+  .section-head .count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  /* Habit list ---------------------------------------------------- */
+  .habits { display: flex; flex-direction: column; gap: 12px; }
+
+  .habit {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), opacity 0.3s var(--ease);
+    animation: rise 0.5s var(--ease) both;
+  }
+  .habit:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+  .habit:active { transform: scale(0.985); }
+
+  .habit .ic {
+    width: 46px; height: 46px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: transform 0.25s var(--ease);
+  }
+  .habit .body { flex: 1; min-width: 0; }
+  .habit .name {
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+    transition: color 0.25s var(--ease);
+  }
+  .habit .meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .habit .meta svg { color: #F59E0B; }
+
+  .check {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.22s var(--ease), background 0.22s var(--ease), transform 0.22s var(--ease);
+  }
+  .check svg {
+    stroke: #fff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    stroke-dasharray: 22;
+    stroke-dashoffset: 22;
+    transition: stroke-dashoffset 0.28s var(--ease) 0.05s;
+  }
+  .habit.done .check {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.05);
+  }
+  .habit.done .check svg { stroke-dashoffset: 0; }
+  .habit.done .ic { transform: scale(0.96); }
+  .habit.done .name { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1.5px; text-decoration-color: rgba(124,120,145,0.55); }
+  .habit.done { opacity: 0.72; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Empty state --------------------------------------------------- */
+  .empty {
+    text-align: center;
+    padding: 34px 20px;
+    color: var(--muted);
+  }
+  .empty .emoji { display: none; }
+  .empty svg { color: #C4B5FD; margin-bottom: 12px; }
+  .empty p { font-size: 14px; line-height: 1.5; }
+
+  /* Tab bar ------------------------------------------------------- */
+  .tabbar {
+    position: absolute;
+    left: 12px; right: 12px; bottom: 12px;
+    height: 76px;
+    background: rgba(255,255,255,0.86);
+    backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: 0 20px 40px -22px rgba(60, 40, 120, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    z-index: 25;
+  }
+  .tab {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 16px;
+    transition: color 0.2s var(--ease), transform 0.2s var(--ease);
+    width: 58px;
+  }
+  .tab span { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1px; }
+  .tab:active { transform: scale(0.9); }
+  .tab.active { color: var(--primary); }
+
+  .fab {
+    width: 58px; height: 58px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(145deg, #8B5CF6, #6D28D9);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 16px 30px -12px rgba(124, 58, 237, 0.85);
+    transform: translateY(-14px);
+    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease);
+  }
+  .fab:hover { transform: translateY(-16px) scale(1.04); }
+  .fab:active { transform: translateY(-12px) scale(0.94); }
+
+  /* Toast --------------------------------------------------------- */
+  .toast {
+    position: absolute;
+    left: 50%;
+    bottom: 104px;
+    transform: translate(-50%, 20px);
+    background: #1E1B2E;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+    z-index: 50;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Focus visibility --------------------------------------------- */
+  button:focus-visible, .habit:focus-visible {
+    outline: 3px solid rgba(124, 58, 237, 0.5);
+    outline-offset: 2px;
+    border-radius: 16px;
+  }
+
+  /* Responsive: real phone --------------------------------------- */
+  @media (max-width: 460px) {
+    body { padding: 0; display: block; }
+    .device {
+      width: 100%; height: 100dvh;
+      border-radius: 0; padding: 0;
+      box-shadow: none;
+    }
+    .screen { border-radius: 0; }
+    .island { display: none; }
+    .statusbar { height: max(52px, env(safe-area-inset-top)); }
+    .content { padding-top: calc(max(52px, env(safe-area-inset-top)) + 10px); }
+    .tabbar { bottom: max(12px, env(safe-area-inset-bottom)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <div class="island" aria-hidden="true"></div>
+
+      <!-- Status bar -->
+      <div class="statusbar" aria-hidden="true">
+        <span>9:41</span>
+        <span class="icons">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6.5" width="3" height="4.5" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.2c2 0 3.8.7 5.2 1.9l1.2-1.4A9.4 9.4 0 0 0 8 .4 9.4 9.4 0 0 0 1.6 2.7l1.2 1.4A7.7 7.7 0 0 1 8 2.2Zm0 3.3c1.1 0 2.1.4 2.9 1l1.2-1.4A6.4 6.4 0 0 0 8 3.7a6.4 6.4 0 0 0-4.1 1.4l1.2 1.4A4.6 4.6 0 0 1 8 5.5Zm0 3.3 1.5 1.7L8 10.8 6.5 8.8 8 5.5Z"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.2" stroke="currentColor" opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor"/><path d="M23 4v4a2.4 2.4 0 0 0 0-4Z" fill="currentColor" opacity="0.5"/></svg>
+        </span>
+      </div>
+
+      <!-- Scrollable content -->
+      <main class="content">
+        <header class="appbar">
+          <div>
+            <div class="greet">Доброе утро,<br />Роман</div>
+            <div class="date">Вторник, 13 октября</div>
+          </div>
+          <div class="avatar-wrap">
+            <button class="icon-btn" aria-label="Уведомления" style="position:relative">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <span class="dot"></span>
+            </button>
+            <div class="avatar" aria-hidden="true">Р</div>
+          </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero" aria-label="Прогресс за день">
+          <div class="hero-text">
+            <div class="eyebrow" id="heroEyebrow">Сегодня</div>
+            <h2 id="heroTitle">Отличный старт утра</h2>
+            <div class="streak-chip">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg>
+              <span id="streakText">12 дней подряд</span>
+            </div>
+          </div>
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="track" cx="50" cy="50" r="42"></circle>
+              <circle class="progress" id="ring" cx="50" cy="50" r="42"></circle>
+            </svg>
+            <div class="ring-label">
+              <div>
+                <div class="pct" id="ringPct">40%</div>
+                <div class="sub" id="ringSub">2 из 5</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Week -->
+        <nav class="week" id="week" aria-label="Дни недели"></nav>
+
+        <!-- Habits -->
+        <div class="section-head">
+          <h3>Привычки дня</h3>
+          <span class="count" id="doneCount">2 из 5</span>
+        </div>
+        <div class="habits" id="habits"></div>
+      </main>
+
+      <!-- Toast -->
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <!-- Tab bar -->
+      <nav class="tabbar" aria-label="Основная навигация">
+        <button class="tab active" aria-label="Сегодня">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+          <span>Сегодня</span>
+        </button>
+        <button class="tab" aria-label="Статистика">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-3 3 3 5-6"/></svg>
+          <span>Статистика</span>
+        </button>
+        <button class="fab" id="addBtn" aria-label="Добавить привычку">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="tab" aria-label="Привычки">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          <span>Привычки</span>
+        </button>
+        <button class="tab" aria-label="Профиль">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Профиль</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+<script>
+  const ICONS = {
+    droplet: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7 17.7 8.3a8 8 0 1 1-11.4 0Z"/></svg>',
+    flower: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 16.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 1 1 4.5 4.5 4.5 4.5 0 1 1-4.5 4.5"/><path d="M12 7.5V9M7.5 12H9M16.5 12H15M12 16.5V15"/></svg>',
+    book: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>',
+    walk: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-2.4C4 11.5 3 10.5 3 8c0-2.7 1.5-6 4.5-6C9.4 2 10 3.8 10 5.5c0 3.1-2 5.7-2 8.7V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.4c0-2.1 1-3.1 1-5.6 0-2.7-1.5-6-4.5-6C14.6 6 14 7.8 14 9.5c0 3.1 2 5.7 2 8.7V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4M4 13h4"/></svg>',
+    pencil: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'
+  };
+
+  const TONES = {
+    sky:     { color: '#0284C7', bg: '#E1F1FC' },
+    violet:  { color: '#7C3AED', bg: '#EEE8FD' },
+    amber:   { color: '#B45309', bg: '#FBEEDA' },
+    emerald: { color: '#059669', bg: '#DCF3E9' },
+    rose:    { color: '#BE123C', bg: '#FCE3EA' }
+  };
+
+  const HABITS = [
+    { id: 'water',    name: 'Пить воду',   meta: '8 стаканов', icon: 'droplet', tone: 'sky',     streak: 12 },
+    { id: 'meditate', name: 'Медитация',   meta: '10 минут',   icon: 'flower',  tone: 'violet',  streak: 7 },
+    { id: 'read',     name: 'Чтение',      meta: '20 страниц', icon: 'book',    tone: 'amber',   streak: 4 },
+    { id: 'walk',     name: 'Прогулка',    meta: '30 минут',   icon: 'walk',    tone: 'emerald', streak: 21 },
+    { id: 'journal',  name: 'Дневник',     meta: 'Вечером',    icon: 'pencil',  tone: 'rose',    streak: 3 }
+  ];
+
+  const WEEK = [
+    { label: 'Пн', num: 12 },
+    { label: 'Вт', num: 13, today: true },
+    { label: 'Ср', num: 14 },
+    { label: 'Чт', num: 15 },
+    { label: 'Пт', num: 16 },
+    { label: 'Сб', num: 17 },
+    { label: 'Вс', num: 18 }
+  ];
+
+  // Completion state per day (Set of habit ids)
+  const done = {
+    0: new Set(['water', 'meditate', 'read']),
+    1: new Set(['water', 'walk'])
+  };
+  let selected = WEEK.findIndex(d => d.today);
+
+  const CIRC = 263.9;
+  const el = (id) => document.getElementById(id);
+  const habitsEl = el('habits');
+  const weekEl = el('week');
+
+  function setFor(day) {
+    if (!done[day]) done[day] = new Set();
+    return done[day];
+  }
+
+  function renderWeek() {
+    weekEl.innerHTML = WEEK.map((d, i) => {
+      const s = done[i] || new Set();
+      const ratio = s.size / HABITS.length;
+      const dotClass = ratio >= 1 ? 'full' : ratio > 0 ? 'partial' : '';
+      const cls = ['day'];
+      if (i === selected) cls.push('selected');
+      if (d.today) cls.push('today');
+      return `
+        <button class="${cls.join(' ')}" data-day="${i}" aria-label="${d.label}, ${d.num} октября${d.today ? ', сегодня' : ''}" aria-pressed="${i === selected}">
+          <span class="letter">${d.label}</span>
+          <span class="pill">
+            <span class="num">${d.num}</span>
+            <span class="dot ${dotClass}"></span>
+          </span>
+        </button>`;
+    }).join('');
+  }
+
+  function renderHabits() {
+    const s = setFor(selected);
+    if (!HABITS.length) { habitsEl.innerHTML = '<div class="empty"><p>Привычек пока нет</p></div>'; return; }
+    habitsEl.innerHTML = HABITS.map((h, i) => {
+      const isDone = s.has(h.id);
+      const t = TONES[h.tone];
+      return `
+        <div class="habit ${isDone ? 'done' : ''}" data-id="${h.id}" role="button" tabindex="0"
+             aria-pressed="${isDone}" aria-label="${h.name}, ${h.meta}, ${isDone ? 'выполнено' : 'не выполнено'}"
+             style="animation-delay:${i * 55}ms">
+          <div class="ic" style="background:${t.bg};color:${t.color}">${ICONS[h.icon]}</div>
+          <div class="body">
+            <div class="name">${h.name}</div>
+            <div class="meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg>
+              <span>${h.streak} ${plural(h.streak)} подряд</span>
+              <span aria-hidden="true">·</span>
+              <span>${h.meta}</span>
+            </div>
+          </div>
+          <button class="check" aria-hidden="true" tabindex="-1">
+            <svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 6.5"/></svg>
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  function plural(n) {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return 'день';
+    if ([2, 3, 4].includes(m10) && ![12, 13, 14].includes(m100)) return 'дня';
+    return 'дней';
+  }
+
+  function renderProgress() {
+    const s = setFor(selected);
+    const total = HABITS.length;
+    const n = s.size;
+    const pct = Math.round((n / total) * 100);
+    el('ringPct').textContent = pct + '%';
+    el('ringSub').textContent = `${n} из ${total}`;
+    el('doneCount').textContent = `${n} из ${total}`;
+    el('ring').style.strokeDashoffset = String(CIRC * (1 - n / total));
+
+    const d = WEEK[selected];
+    if (d && d.today) {
+      el('heroEyebrow').textContent = 'Сегодня';
+      el('heroTitle').textContent = n === total ? 'Все привычки выполнены' : n === 0 ? 'Начни с одной привычки' : 'Ты на верном пути';
+    } else {
+      el('heroEyebrow').textContent = `${d.label}, ${d.num} октября`;
+      el('heroTitle').textContent = n === total ? 'День закрыт полностью' : 'Итог дня';
+    }
+  }
+
+  function renderAll() { renderWeek(); renderHabits(); renderProgress(); }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = el('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  function toggle(id) {
+    const s = setFor(selected);
+    const wasDone = s.has(id);
+    if (wasDone) s.delete(id); else s.add(id);
+    renderWeek();
+    renderHabits();
+    renderProgress();
+    if (!wasDone && s.size === HABITS.length) toast('Все привычки на сегодня — готово');
+  }
+
+  // Events
+  weekEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.day');
+    if (!btn) return;
+    selected = Number(btn.dataset.day);
+    renderAll();
+  });
+
+  habitsEl.addEventListener('click', (e) => {
+    const row = e.target.closest('.habit');
+    if (!row) return;
+    toggle(row.dataset.id);
+  });
+
+  habitsEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest('.habit');
+    if (!row) return;
+    e.preventDefault();
+    toggle(row.dataset.id);
+  });
+
+  el('addBtn').addEventListener('click', () => toast('Новая привычка'));
+
+  renderAll();
+</script>
+</body>
+</html>
